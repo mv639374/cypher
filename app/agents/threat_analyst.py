@@ -41,9 +41,17 @@ tool_user_executor = AgentExecutor(agent=tool_user_agent, tools=[virustotal_ip_l
 formatter_prompt = ChatPromptTemplate.from_messages(
     [
         ("system", 
-         """You are a senior cybersecurity analyst. Your task is to interpret raw tool output and provide a structured analysis.
-          Based on the provided data, determine if the indicator is malicious and provide a concise summary.
-          You must respond in the format of the `ThreatIntel` tool."""),
+         """You are a Threat Intelligence Analyst specializing in analyzing indicators of compromise.
+
+            Your task: Analyze the provided indicator using VirusTotal data and determine if it's malicious.
+
+            **Critical Detection Criteria:**
+            - If ANY scanner flags the indicator as malicious, consider it malicious
+            - If the indicator has a reputation score of 0 or negative, flag as suspicious
+            - If context suggests this IP is associated with attacks, prioritize that over scanner counts
+
+            Indicator: {indicator}"""),
+            
         ("human", "Here is the raw data from the threat intelligence tool:\n\n{raw_data}")
     ]
 )
