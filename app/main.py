@@ -10,15 +10,14 @@ from langgraph.graph import START, StateGraph, END
 from app.state import GraphState
 from app.agents.threat_analyst import run_threat_analyst
 from app.agents.log_analyst import run_log_analyst
+from app.agents.consultant_agent import run_consultant_agent
 from app.agents.policy_agent import run_policy_agent
 from app.agents.supervisor import supervisor_chain
 
-def run_supervisor(state: GraphState) -> dict: # <-- Change return type to dict
-    """
-    Runs the supervisor chain and saves its decision to the state.
-    """
+def run_supervisor(state: GraphState):
+    """Runs the supervisor to decide the next step."""
     print("---SUPERVISOR---")
-    # ... (the logic for calling supervisor_chain is the same)
+    
     threat_detected = (state.get('intel') and state['intel'].is_malicious) or \
                       (state.get('log_summary') and state['log_summary'].contains_anomaly)
 
@@ -27,9 +26,9 @@ def run_supervisor(state: GraphState) -> dict: # <-- Change return type to dict
         "log_summary_available": 'Yes' if state.get('log_summary') else 'No',
         "policy_generated": 'Yes' if state.get('policy') else 'No',
         "threat_detected": 'Yes' if threat_detected else 'No',
+        "playbook_consulted": 'Yes' if state.get('playbook_steps') else 'No', # <-- ADD THIS LINE
         "investigation_trace": "\n".join(state.get('investigation_trace', []))
     })
-    # Return ONLY the fields that have been updated
     return {"next_node": response.next}
 
 def route(state: GraphState) -> str:
@@ -41,6 +40,7 @@ def route(state: GraphState) -> str:
 graph = (StateGraph(GraphState)
         .add_node("threat_analyst", run_threat_analyst)
         .add_node("log_analyst", run_log_analyst)
+        .add_node("consultant_agent", run_consultant_agent)
         .add_node("policy_agent", run_policy_agent)
         .add_node("supervisor", run_supervisor)
         .add_edge(START, "supervisor")
@@ -50,12 +50,14 @@ graph = (StateGraph(GraphState)
             {
                 "Threat_Analyst":"threat_analyst",
                 "Log_Analyst": "log_analyst",
+                "Consultant_Agent": "consultant_agent",
                 "Policy_Agent": "policy_agent",
                 'end_investigation': END
             }
         )
         .add_edge("threat_analyst", "supervisor")
         .add_edge("log_analyst", "supervisor")
+        .add_edge("consultant_agent", "supervisor")
         .add_edge("policy_agent", "supervisor")).compile()
 
 print("Graph Compiled Successfully!")

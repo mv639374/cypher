@@ -8,6 +8,8 @@ venv/
 .env
 gcp-credentials.json
 .pytest_cache/
+vector_store
+.langgraph_api
 
 # Node.js / Frontend
 frontend/node_modules/

@@ -18,6 +18,7 @@ export default function Home() {
   const [events, setEvents] = useState<GraphEvent[]>([]);
   const [finalState, setFinalState] = useState<GraphEvent | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [playbookSteps, setPlaybookSteps] = useState<string | null>(null);
   
   const socketRef = useRef<Socket | null>(null);
 
@@ -27,12 +28,20 @@ export default function Home() {
 
     socket.on("connect", () => console.log("Connected to WebSocket server."));
     socket.on("investigation_started", () => {
+      console.log("Server acknowledged investigation start.");
       setIsStreaming(true);
       setEvents([]);
       setFinalState(null);
+      setPlaybookSteps(null);
     });
     socket.on("graph_event", (event: GraphEvent) => {
       setEvents((prevEvents) => [...prevEvents, event]);
+
+      // to handle the consultant's output
+      if (event.consultant_agent) {
+        setPlaybookSteps(event.consultant_agent.playbook_steps[0]);
+      }
+
       if (event.__end__) {
         setFinalState(event.__end__);
       }
@@ -87,6 +96,16 @@ export default function Home() {
             >
               {isStreaming ? "Investigating..." : "Start Investigation"}
             </button>
+            {/* NEW: Co-Pilot Suggestions Panel */}
+            {playbookSteps && (
+              <div className="mt-6 bg-cyan-900/50 border border-cyan-700 p-4 rounded-lg animate-fadeIn">
+                <h3 className="text-lg font-semibold text-cyan-300 mb-2 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                  Co-Pilot Recommendation
+                </h3>
+                <p className="text-gray-300 whitespace-pre-wrap">{playbookSteps}</p>
+              </div>
+            )}
           </div>
         </div>
         {(events.length > 0 || isStreaming) && (
