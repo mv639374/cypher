@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.env
+.pytest_cache/
+
+# Node.js / Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.DS_Store
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.env.local
+.DS_Store
+
+# IDE configuration
+.idea/
+.vscode/
