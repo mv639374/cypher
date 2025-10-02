@@ -22,7 +22,7 @@ export default function Home() {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const socket = io("http://localhost:8000");
+    const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000");
     socketRef.current = socket;
 
     socket.on("connect", () => console.log("Connected to WebSocket server."));

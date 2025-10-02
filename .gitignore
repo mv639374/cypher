@@ -6,6 +6,7 @@ __pycache__/
 .Python
 venv/
 .env
+gcp-credentials.json
 .pytest_cache/
 
 # Node.js / Frontend
@@ -23,3 +24,4 @@ frontend/.env.local
 # IDE configuration
 .idea/
 .vscode/
+
