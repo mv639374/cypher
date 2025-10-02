@@ -67,7 +67,7 @@ def run_threat_analyst(state: GraphState) -> dict: # <-- Change return type to d
     
     tool_response = tool_user_executor.invoke({"input": indicator})
     raw_data_str = tool_response["output"]
-    structured_output = formatter_chain.invoke({"raw_data": raw_data_str})
+    structured_output = formatter_chain.invoke({"indicator":indicator, "raw_data": raw_data_str})
     
     trace_message = f"Threat Analyst conclusion: The indicator '{indicator}' is {'malicious' if structured_output.is_malicious else 'benign'}."
     
