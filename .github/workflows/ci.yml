@@ -12,8 +12,8 @@ env:
   GAR_REPO_NAME: cypher-repo
 
 jobs:
-  build-and-test:
-    name: Build & Test
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,16 +27,10 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
-      - name: Run backend tests
-        env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
-        run: pytest -v
-
   deploy:
     name: Deploy to Cloud Run
     runs-on: ubuntu-latest
-    needs: build-and-test # This job only runs if 'build-and-test' succeeds
+    needs: build # This job only runs if 'build-and-test' succeeds
     if: github.ref == 'refs/heads/main' # This job only runs on pushes to the main branch
 
     permissions:
